@@ -1010,7 +1010,7 @@ with gr.Blocks(theme=theme, css=css, title="VieNeu-TTS", head=head_html) as demo
             with gr.Row():
                 backbone_select = gr.Dropdown(
                     list(BACKBONE_CONFIGS.keys()) + ["Custom Model"], 
-                    value="VieNeu-TTS (GPU)", 
+                    value="Custom Model",
                     label="🦜 Backbone"
                 )
                 codec_select = gr.Dropdown(list(CODEC_CONFIGS.keys()), value="NeuCodec (Distill)", label="🎵 Codec")
@@ -1021,7 +1021,8 @@ with gr.Blocks(theme=theme, css=css, title="VieNeu-TTS", head=head_html) as demo
                     label="📦 Custom Model ID",
                     placeholder="pnnbao-ump/VieNeu-TTS-0.3B-lora-ngoc-huyen",
                     info="Nhập HuggingFace Repo ID hoặc đường dẫn local",
-                    scale=2
+                    scale=2,
+                    value='pnnbao-ump/VieNeu-TTS-0.3B-lora-ngoc-huyen'
                 )
                 custom_backbone_hf_token = gr.Textbox(
                     label="🔑 HF Token (nếu private)",
