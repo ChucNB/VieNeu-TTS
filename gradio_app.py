@@ -16,6 +16,21 @@ from vieneu_utils.core_utils import split_text_into_chunks, join_audio_chunks, e
 from functools import lru_cache
 import gc
 
+from datetime import datetime
+
+
+def get_save_path(results_dir="results"):
+    # Tạo folder theo ngày: results/2026-01-21/
+    date_str = datetime.now().strftime("%Y-%m-%d")
+    target_dir = os.path.join(results_dir, date_str)
+
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir, exist_ok=True)
+
+    # Đặt tên file theo giờ phút giây để không bị trùng
+    file_name = datetime.now().strftime("%H%M%S_%f") + ".wav"
+    return os.path.join(target_dir, file_name)
+
 # --- CONSTANTS & CONFIG ---
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config.yaml")
 try:
@@ -683,13 +698,15 @@ def synthesize_speech(text: str, voice_choice: str, custom_audio, custom_text: s
             final_wav = join_audio_chunks(all_wavs, sr=sr, silence_p=0.15)
             
             with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
-                sf.write(tmp.name, final_wav, sr)
-                output_path = tmp.name
+                output_path = get_save_path("my_tts_results")
+                sf.write(output_path, final_wav, sr)
+                # sf.write(tmp.name, final_wav, sr)
+                # output_path = tmp.name
             
             process_time = time.time() - start_time
             backend_info = f" (Backend: {'LMDeploy 🚀' if using_lmdeploy else 'Standard 📦'})"
             speed_info = f", Tốc độ: {len(final_wav)/sr/process_time:.2f}x realtime" if process_time > 0 else ""
-            
+
             
             yield output_path, f"✅ Hoàn tất! (Thời gian: {process_time:.2f}s{speed_info}){backend_info}"
             
@@ -826,7 +843,9 @@ def synthesize_speech(text: str, voice_choice: str, custom_audio, custom_text: s
         if full_audio_buffer:
             final_wav = np.concatenate(full_audio_buffer)
             with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
-                sf.write(tmp.name, final_wav, sr)
+                output_path = get_save_path("my_tts_results")
+                sf.write(output_path, final_wav, sr)
+                # sf.write(tmp.name, final_wav, sr)
                 
                 yield tmp.name, f"✅ Hoàn tất Streaming! ({backend_info})"
             
