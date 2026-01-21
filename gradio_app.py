@@ -1014,7 +1014,7 @@ with gr.Blocks(theme=theme, css=css, title="VieNeu-TTS", head=head_html) as demo
                     label="🦜 Backbone"
                 )
                 codec_select = gr.Dropdown(list(CODEC_CONFIGS.keys()), value="NeuCodec (Distill)", label="🎵 Codec")
-                device_choice = gr.Radio(get_available_devices(), value="Auto", label="🖥️ Device")
+                device_choice = gr.Radio(get_available_devices(), value="CUDA", label="🖥️ Device")
             
             with gr.Row(visible=False) as custom_model_group:
                 custom_backbone_model_id = gr.Textbox(
@@ -1196,11 +1196,14 @@ with gr.Blocks(theme=theme, css=css, title="VieNeu-TTS", head=head_html) as demo
             is_custom = (choice == "Custom Model")
             return gr.update(visible=is_custom)
 
+
         backbone_select.change(
             on_backbone_change,
             inputs=[backbone_select],
             outputs=[custom_model_group]
         )
+
+        demo.load(on_backbone_change, inputs=[backbone_select], outputs=[custom_model_group])
         
         def on_custom_id_change(model_id):
             # Auto detect LoRA and base model
